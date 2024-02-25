@@ -72,4 +72,3 @@ def createPrediction(test_text, fileUrl="language_data.csv"):
         createModel(fileUrl)
 
     return languageDetectionModel.predict(test_text)
-
