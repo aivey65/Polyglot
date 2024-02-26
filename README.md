@@ -70,6 +70,27 @@ For reference, this is how you create a new Django project. Specifying the locat
 
 > django-admin startproject [project-name] [path]
 
+To create a Django application (located inside a Django project):
+
+> django-admin startapp [app-name]
+
 To start the development server, use this command:
 
 > python3 manage.py runserver
+
+To create a database using Django:
+
+> python manage.py makemigrations
+> python manage.py sqlmigrate [name-of-app] [migration-initial-number]
+> python manage.py migrate
+
+To create an admin account:
+
+> python manage.py createsuperuser
+
+#### Notes on Deploying
+Instructions:
+Coming Soon...
+
+Here are some things to remember when deploying this project:
+1. Remember to change the debug setting in "Polyglot/settings.py" to "False".
