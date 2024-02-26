@@ -81,7 +81,9 @@ To start the development server, use this command:
 To create a database using Django:
 
 > python manage.py makemigrations
+
 > python manage.py sqlmigrate [name-of-app] [migration-initial-number]
+
 > python manage.py migrate
 
 To create an admin account:
