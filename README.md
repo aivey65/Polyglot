@@ -2,7 +2,7 @@
 A language detection machine learning model
 
 ## About
-This language detection model can detect 42 different languages with ~88% accuracy. It is still a work in progress.
+This language detection model can detect 42 different languages with ~96% accuracy. It is still a work in progress.
 
 ## Corpus Source
 The data used to train the model is a subset of this data set: https://www.kaggle.com/datasets/chazzer/big-language-detection-dataset?resource=download
