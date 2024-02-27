@@ -58,14 +58,14 @@ Samoan
 I used the **scikit-learn** CountVectorizer and the MultinomialNB classifying model.
 
 ## Development Workflow
-#### Dependencies
+### Dependencies
 Dependencies used are listed in requirements.txt. You can create a virtual environment and then run 
 
 > pip install -r requirements.txt
 
 to install them all at once.
 
-#### Creating a Django Project and Running a Development Server
+### Creating a Django Project and Running a Development Server
 For reference, this is how you create a new Django project. Specifying the location of the project (".") will create a project inside the current directory, which is useful if you already have a github repository.
 
 > django-admin startproject [project-name] [path]
