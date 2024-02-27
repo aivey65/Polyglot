@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
+
+{% block header %}
+<script src="../static/results.js"></script>
+{% endblock %}
+
 {% block content %}
-<h1>Results:</h1>
-<p>{{data}}</p>
-<p id="accuracy-container"></p>
+<div id="result-content">
+    <div id="identify-section">
+        <h2 id="results-header">Result:</h2>
+        <p id="results-container">{{data}}</p>
+    </div>
+    <div id="accuracy-section">
+        <p id="accuracy-container"></p>
+    </div>
+</div>
+
 <a href="/">Go home</a>
 {% endblock %}

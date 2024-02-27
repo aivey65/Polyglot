@@ -5,16 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polyglot</title>
 
+    {% block heaeder %}
+    {% endblock %}
     <script src="../static/scripts.js"></script>
+    <link rel='stylesheet' href="../static/style.css" />
+
+    <!-- Font Imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="content">
-        <h1>Polyglot</h1>
+        <h1 id="title">Polyglot</h1>
         {% block content %}
         {% endblock %}
 
         <h3>Supported Languages</h3>
-        <p>
+        <p id="supported-languages">
             English • Mandarin Chinese • Hindi • Spanish • French • Arabic • Bengali • Russian • 
             Portuguese • Indonesian • Urdu • German • Japanese • Swahili • Punjabi • Tamil • 
             Korean • Vietnamese • Javanese • Italian • Thai • Tagalog • Polish • Yoruba • Ukrainian •

@@ -1,7 +1,73 @@
 :root {
-    --green: #B7F0AD,
-    --greenL: #D2FF96,
-    --gold: #EDFF7A,
-    --orangeL: #E8D33F,
-    --orange: #D17B0F
+    --light: #ECF2CF;
+    --green: #1B998B;
+    --red: #E71D36;
+    --navy: #272343;
+    --grey: #5E5C6F;
+
+    --smallPad: 15px;
+    --medPad: 30px;
+    --borderRadius: 20px;
+}
+
+body {
+    font-family: "Rubik", sans-serif;
+    background-color: var(--light);
+    color: var(--navy);
+    margin: var(--smallPad);
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--smallPad);
+}
+
+label {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+button {
+    background-color: var(--green);
+    border: none;
+    color: var(--light);
+    padding: var(--smallPad) var(--medPad);
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    border-radius: var(--borderRadius);
+}
+
+#content {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#supported-languages {
+    color: var(--grey);
+    text-align: center;
+}
+
+#result-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#results-header {
+    margin: 0px;
+}
+
+#results-container {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--green);
+    margin-top: var(--smallPad);
 }

@@ -29,12 +29,12 @@ def predict(request):
         return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
-def getAccuracy():
+def getAccuracy(request):
     try:
         accuracy = testModel()
         accuracy = str(round(accuracy, 3) * 100) + "%"
 
-        return accuracy
+        return Response(accuracy, status.HTTP_200_OK)
     except ValueError as e: 
         return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
 
