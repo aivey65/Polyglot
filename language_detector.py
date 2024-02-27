@@ -9,33 +9,37 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import ComplementNB
 from sklearn.metrics import accuracy_score
 
+from tokenizers import Tokenizer
+from tokenizers.models import WordPiece
+from tokenizers.pre_tokenizers import Whitespace
+from tokenizers.trainers import WordPieceTrainer
+
 TOP_LANG = ["eng", "cmn", "hin", "spa", "fra", "ara", "ben", "rus", "por", "ind", "urd", "deu", "jpn", "swh", "pnb", "tam", "kor", "vie", "jav", "ita", "tha", "tgl", "pol", "yor", "ukr", "ibo", "npi", "ron", "nld", "zsm", "afr", "grc", "swe", "heb", "lat", "san", "gle", "mri", "chr", "nav", "haw", "smo"]
 
 languageDetectionModel = None
 cv = None
 
-def preprocessData(fileUrl="language_data.csv"):
-    data = pd.read_csv(fileUrl)
+def preprocessText(text):
+    text = re.sub(r"(?=[\p{Common}])[^']|(?<![a-zA-Z])'|'(?![a-zA-Z])", " ", text.lower())
+    if " " not in text:
+        " ".join(text)
 
-    data.drop(["id"], axis=1, inplace=True)
-    data["sentence"] = data.apply(lambda x: re.sub(r"(?=[\p{Common}])[^']|(?<![a-zA-Z])'|'(?![a-zA-Z])", " ", x["sentence"].lower()), axis=1)
+    return text
 
-    filtered_data = data[data["lan_code"].isin(TOP_LANG)]
 
-    """ To enforce all languages have an equal number of samples:"""
-    # filtered_data = filtered_data.groupby("lan_code").sample(28)
-
-    """ To just ensure that language sample sizes are not larger than 800:"""
-    filtered_data = filtered_data[filtered_data.groupby("lan_code").cumcount() < 1000]
-
-    data.to_csv(fileUrl, encoding='utf-8', index=False)
-
-def createModel(fileUrl="language_data.csv"):
+def createModel(fileUrl="language_corpus.csv"):
     data = pd.read_csv(fileUrl)
     train_text = data["sentence"]
 
     le = LabelEncoder()
-    labels = le.fit_transform(data["lan_code"])
+    le.fit(data["lan_code"])
+    labels = le.transform(data["lan_code"])
+
+    # tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
+    # tokenizer.pre_tokenizer = Whitespace()
+    # trainer = WordPieceTrainer(vocab_size=1000000, special_tokens=["[UNK]"])
+    # tokenizer.train(data["sentences"], trainer)
+    # tokenizer.save("MLModel/tokenizer")
 
     cv = CountVectorizer(ngram_range=(1,4))
     cv.fit(train_text)
@@ -46,11 +50,12 @@ def createModel(fileUrl="language_data.csv"):
 
     joblib.dump(languageDetectionModel, "MLModel/language_detection_model.joblib")
     joblib.dump(cv, "MLModel/vectorizer.joblib")
+    joblib.dump(le, "MLModel/label_encoder.joblib")
 
 def splitData(text_data, labels, test_size=0.2):
     return train_test_split(text_data, labels, test_size=0.2)
 
-def testModel(fileUrl="language_data.csv"):
+def testModel(fileUrl="language_corpus.csv"):
     data = pd.read_csv(fileUrl)
     text_data = data["sentence"]
 
@@ -71,18 +76,22 @@ def testModel(fileUrl="language_data.csv"):
 
     return accuracy_score(test_labels, predictions)
 
-def createPrediction(prediction_text, fileUrl="language_data.csv"):
+def createPrediction(prediction_text, fileUrl="language_corpus.csv"):
     languageDetectionModel = None
     cv = None
+    labelEncoder = None
 
     try:
         languageDetectionModel = joblib.load("MLModel/language_detection_model.joblib")
         cv = joblib.load("MLModel/vectorizer.joblib")
+        labelEncoder = joblib.load("MLModel/label_encoder.joblib")
     except Exception as e:
         createModel(fileUrl)
         languageDetectionModel = joblib.load("MLModel/language_detection_model.joblib")
         cv = joblib.load("MLModel/vectorizer.joblib")
+        labelEncoder = joblib.load("MLModel/label_encoder.joblib")
 
-    prediction_text = cv.transform([prediction_text])
+    prediction_text = cv.transform([preprocessText(prediction_text)])
+    result = languageDetectionModel.predict(prediction_text)
 
-    return languageDetectionModel.predict(prediction_text)
+    return labelEncoder.inverse_transform(result)

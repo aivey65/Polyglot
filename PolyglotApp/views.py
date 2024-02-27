@@ -15,6 +15,7 @@ import json
 import pandas as pd 
 import numpy as np 
 import regex as re
+import json
 
 from language_detector import createPrediction
 
@@ -26,7 +27,13 @@ class DataPointView(viewsets.ModelViewSet):
 def predict(request):
     try:
         prediction_text = request.POST.get("text-input", "")
-        result = createPrediction(prediction_text)
+        prediction = createPrediction(prediction_text)
+
+        with open("lan_to_language.json") as json_data:
+            lanToLanguageDict = json.load(json_data)
+
+        result = lanToLanguageDict[prediction[0]]
+
         return render(request, "results.html", {"data": result})
     except ValueError as e: 
         return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
