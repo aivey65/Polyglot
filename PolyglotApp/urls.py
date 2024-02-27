@@ -7,6 +7,6 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('detect-language', views.showPredictionForm, name="showPredictionForm"),
     path('predict', views.predict, name="predict"),
+    path('get-accuracy', views.getAccuracy, name="getAccuracy")
 ]

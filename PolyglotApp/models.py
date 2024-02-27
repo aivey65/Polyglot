@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class DataPoint(models.Model):
     sentence = models.TextField()
     lanCode = models.CharField(max_length=3)

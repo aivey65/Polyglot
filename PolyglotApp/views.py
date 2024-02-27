@@ -9,21 +9,11 @@ from .models import DataPoint
 from .serializer import DataPointSerializers 
 from django.shortcuts import render, redirect 
 from django.contrib import messages
-
-import pickle
-import json 
-import pandas as pd 
-import numpy as np 
-import regex as re
 import json
 
-from language_detector import createPrediction
+from language_detector import createPrediction, testModel
 
-class DataPointView(viewsets.ModelViewSet):
-    queryset = DataPoint.objects.all()
-    serializer_class = DataPointSerializers
-
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def predict(request):
     try:
         prediction_text = request.POST.get("text-input", "")
@@ -37,9 +27,16 @@ def predict(request):
         return render(request, "results.html", {"data": result})
     except ValueError as e: 
         return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def getAccuracy():
+    try:
+        accuracy = testModel()
+        accuracy = str(round(accuracy, 3) * 100) + "%"
+
+        return accuracy
+    except ValueError as e: 
+        return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
 
 def index(request):
     return render(request, "index.html")
-
-def showPredictionForm(request):
-    return render(request, "predictionForm.html")

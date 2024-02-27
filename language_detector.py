@@ -16,9 +16,6 @@ from tokenizers.trainers import WordPieceTrainer
 
 TOP_LANG = ["eng", "cmn", "hin", "spa", "fra", "ara", "ben", "rus", "por", "ind", "urd", "deu", "jpn", "swh", "pnb", "tam", "kor", "vie", "jav", "ita", "tha", "tgl", "pol", "yor", "ukr", "ibo", "npi", "ron", "nld", "zsm", "afr", "grc", "swe", "heb", "lat", "san", "gle", "mri", "chr", "nav", "haw", "smo"]
 
-languageDetectionModel = None
-cv = None
-
 def preprocessText(text):
     text = re.sub(r"(?=[\p{Common}])[^']|(?<![a-zA-Z])'|'(?![a-zA-Z])", " ", text.lower())
     if " " not in text:
@@ -55,31 +52,44 @@ def createModel(fileUrl="language_corpus.csv"):
     joblib.dump(vectorizer, "MLModel/vectorizer.joblib")
     joblib.dump(le, "MLModel/label_encoder.joblib")
 
-def splitData(text_data, labels, test_size=0.2):
-    return train_test_split(text_data, labels, test_size=test_size)
-
 def testModel(fileUrl="language_corpus.csv"):
+    tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
+    tokenizer.pre_tokenizer = Whitespace()
+    trainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
+    tokenizer.train([fileUrl], trainer)
+
     data = pd.read_csv(fileUrl)
-    text_data = data["sentence"]
+    tokenized_data = tokenizer.encode_batch(data["sentence"])
+
+    tokenized_data = [i.tokens for i in tokenized_data]
 
     le = LabelEncoder()
-    labels = le.fit_transform(data["lan_code"])
+    le.fit(data["lan_code"])
+    labels = le.transform(data["lan_code"])
 
-    train_text, test_text, train_labels, test_labels = train_test_split(text_data, labels, test_size=0.2)
+    train_text, test_text, train_labels, test_labels = train_test_split(tokenized_data, labels, test_size=0.2)
 
-    cv = CountVectorizer(ngram_range=(1,4))
-    cv.fit(train_text)
-    train_text = cv.transform(train_text)
-    test_text = cv.transform(test_text)
+    vectorizer = TfidfVectorizer(ngram_range=(1,3), analyzer=returnSelf)
+    vectorizer.fit(train_text)
+    train_text = vectorizer.transform(train_text)
+    test_text = vectorizer.transform(test_text)
 
-    model = ComplementNB()
-    model.fit(train_text, train_labels)
+    languageDetectionModel = ComplementNB()
+    languageDetectionModel.fit(train_text, train_labels)
 
-    predictions = model.predict(test_text)
+    predictions = languageDetectionModel.predict(test_text)
 
     return accuracy_score(test_labels, predictions)
 
 def createPrediction(prediction_text, fileUrl="language_corpus.csv"):
+    languageDetectionModel, vectorizer, labelEncoder = pullMLResources(fileUrl)
+
+    prediction_text = vectorizer.transform([preprocessText(prediction_text)])
+    result = languageDetectionModel.predict(prediction_text)
+
+    return labelEncoder.inverse_transform(result)
+
+def pullMLResources(corpusFile="language_corpus.csv"):
     languageDetectionModel = None
     vectorizer = None
     labelEncoder = None
@@ -89,12 +99,9 @@ def createPrediction(prediction_text, fileUrl="language_corpus.csv"):
         vectorizer = joblib.load("MLModel/vectorizer.joblib")
         labelEncoder = joblib.load("MLModel/label_encoder.joblib")
     except OSError as e:
-        createModel(fileUrl)
+        createModel(corpusFile)
         languageDetectionModel = joblib.load("MLModel/language_detection_model.joblib")
         vectorizer = joblib.load("MLModel/vectorizer.joblib")
         labelEncoder = joblib.load("MLModel/label_encoder.joblib")
 
-    prediction_text = vectorizer.transform([preprocessText(prediction_text)])
-    result = languageDetectionModel.predict(prediction_text)
-
-    return labelEncoder.inverse_transform(result)
+    return languageDetectionModel, vectorizer, labelEncoder
