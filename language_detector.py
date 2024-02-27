@@ -5,7 +5,7 @@ import joblib
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import ComplementNB
 from sklearn.metrics import accuracy_score
 
@@ -26,34 +26,37 @@ def preprocessText(text):
 
     return text
 
+def returnSelf(x):
+    return x
 
 def createModel(fileUrl="language_corpus.csv"):
+    tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
+    tokenizer.pre_tokenizer = Whitespace()
+    trainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
+    tokenizer.train([fileUrl], trainer)
+
     data = pd.read_csv(fileUrl)
-    train_text = data["sentence"]
+    tokenized_data = tokenizer.encode_batch(data["sentence"])
+
+    train_text = [i.tokens for i in tokenized_data]
 
     le = LabelEncoder()
     le.fit(data["lan_code"])
     labels = le.transform(data["lan_code"])
 
-    # tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
-    # tokenizer.pre_tokenizer = Whitespace()
-    # trainer = WordPieceTrainer(vocab_size=1000000, special_tokens=["[UNK]"])
-    # tokenizer.train(data["sentences"], trainer)
-    # tokenizer.save("MLModel/tokenizer")
-
-    cv = CountVectorizer(ngram_range=(1,4))
-    cv.fit(train_text)
-    train_text = cv.transform(train_text)
+    vectorizer = TfidfVectorizer(ngram_range=(1,3), analyzer=returnSelf)
+    vectorizer.fit(train_text)
+    train_text = vectorizer.transform(train_text)
 
     languageDetectionModel = ComplementNB()
     languageDetectionModel.fit(train_text, labels)
 
     joblib.dump(languageDetectionModel, "MLModel/language_detection_model.joblib")
-    joblib.dump(cv, "MLModel/vectorizer.joblib")
+    joblib.dump(vectorizer, "MLModel/vectorizer.joblib")
     joblib.dump(le, "MLModel/label_encoder.joblib")
 
 def splitData(text_data, labels, test_size=0.2):
-    return train_test_split(text_data, labels, test_size=0.2)
+    return train_test_split(text_data, labels, test_size=test_size)
 
 def testModel(fileUrl="language_corpus.csv"):
     data = pd.read_csv(fileUrl)
@@ -78,20 +81,20 @@ def testModel(fileUrl="language_corpus.csv"):
 
 def createPrediction(prediction_text, fileUrl="language_corpus.csv"):
     languageDetectionModel = None
-    cv = None
+    vectorizer = None
     labelEncoder = None
 
     try:
         languageDetectionModel = joblib.load("MLModel/language_detection_model.joblib")
-        cv = joblib.load("MLModel/vectorizer.joblib")
+        vectorizer = joblib.load("MLModel/vectorizer.joblib")
         labelEncoder = joblib.load("MLModel/label_encoder.joblib")
-    except Exception as e:
+    except OSError as e:
         createModel(fileUrl)
         languageDetectionModel = joblib.load("MLModel/language_detection_model.joblib")
-        cv = joblib.load("MLModel/vectorizer.joblib")
+        vectorizer = joblib.load("MLModel/vectorizer.joblib")
         labelEncoder = joblib.load("MLModel/label_encoder.joblib")
 
-    prediction_text = cv.transform([preprocessText(prediction_text)])
+    prediction_text = vectorizer.transform([preprocessText(prediction_text)])
     result = languageDetectionModel.predict(prediction_text)
 
     return labelEncoder.inverse_transform(result)
