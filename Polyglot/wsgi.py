@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'PolyglotProject.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Polyglot.settings')
 
 application = get_wsgi_application()

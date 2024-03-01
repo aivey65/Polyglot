@@ -162,3 +162,8 @@ cython_debug/
 # Large Corpus
 *.csv
 lan_to_language.json
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

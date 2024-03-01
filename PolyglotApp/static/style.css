@@ -58,10 +58,10 @@ button {
 
 #result-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto;
 }
 
-#results-header {
+.results-header {
     margin: 0px;
 }
 
@@ -70,4 +70,16 @@ button {
     font-weight: 600;
     color: var(--green);
     margin-top: var(--smallPad);
+}
+
+#accuracy-section {
+    display: flex;
+    flex-direction: column;
+}
+
+#accuracy-container {
+    font-size: 2rem;
+    font-weight: 600;
+    align-self: flex-end;
+    color: var(--grey);
 }
