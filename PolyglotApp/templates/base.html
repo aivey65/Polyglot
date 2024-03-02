@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polyglot</title>
-    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+
+    {% load static %}
+
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <link rel='stylesheet' href="{% static 'css/style.css' %}" />
 
     {% block header %}
     {% endblock %}
-    <script src="../static/scripts.js"></script>
-    <link rel='stylesheet' href="../static/style.css" />
-
+    
     <!-- Font Imports -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +21,9 @@
 </head>
 <body>
     <div id="content">
-        <img src="../static/PolyglotLogo.svg" alt="Polyglot logo">
+        {% load static %}
+        <img id="title" src="{% static 'images/PolyglotLogo.svg' %}" alt="Polyglot logo">
+
         {% block content %}
         {% endblock %}
 
