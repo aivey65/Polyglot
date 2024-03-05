@@ -32,7 +32,6 @@ def predict(request):
 def getAccuracy(request):
     try:
         accuracy = testModel()
-        accuracy = str(round(accuracy, 3) * 100) + "%"
 
         return Response(accuracy, status.HTTP_200_OK)
     except ValueError as e: 
