@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyglot</title>
+
+    {% load static %}
+    <base href="{% static '/' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <script type='text/javascript' src="{% static 'js/scripts.js' %}"></script>
+    <link type='text/css' rel='stylesheet' href="{% static 'css/style.css' %}" />
+
+    {% block header %}
+    {% endblock %}
+    
+    <!-- Font Imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="content">
+        {% load static %}
+        <img id="title" src="{% static 'images/PolyglotLogo.svg' %}" alt="Polyglot logo">
+
+        {% block content %}
+        {% endblock %}
+
+        <h3>Supported Languages</h3>
+        <p id="supported-languages">
+            English • Mandarin Chinese • Hindi • Spanish • French • Arabic • Bengali • Russian • 
+            Portuguese • Indonesian • Urdu • German • Japanese • Swahili • Punjabi • Tamil • 
+            Korean • Vietnamese • Javanese • Italian • Thai • Tagalog • Polish • Yoruba • Ukrainian •
+            Igbo • Nepali • Romanian • Dutch • Malay • Afrikaans • Greek • Swedish • Hebrew • Latin • 
+            Sanskrit • Irish • Maori • Cherokee • Navajo • Hawaiian • Samoan
+        </p>
+    </div>
+</body>
+</html>

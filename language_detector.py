@@ -17,31 +17,34 @@ from tokenizers.trainers import WordPieceTrainer
 TOP_LANG = ["eng", "cmn", "hin", "spa", "fra", "ara", "ben", "rus", "por", "ind", "urd", "deu", "jpn", "swh", "pnb", "tam", "kor", "vie", "jav", "ita", "tha", "tgl", "pol", "yor", "ukr", "ibo", "npi", "ron", "nld", "zsm", "afr", "grc", "swe", "heb", "lat", "san", "gle", "mri", "chr", "nav", "haw", "smo"]
 
 def preprocessText(text):
-    text = re.sub(r"(?=[\p{Common}])[^']|(?<![a-zA-Z])'|'(?![a-zA-Z])", " ", text.lower())
-    if " " not in text:
-        " ".join(text)
+    pieceTokenizer = joblib.load("MLModel/word_piece.joblib")
 
-    return text
+    text = re.sub(r"(?=[\p{Common}])[^']|(?<![a-zA-Z])'|'(?![a-zA-Z])", " ", text.lower())
+    line = text.strip()
+
+    if " " not in line:
+        line = " ".join(pieceTokenizer.encode(line).tokens)
+
+    return line
 
 def returnSelf(x):
     return x
 
 def createModel(fileUrl="language_corpus.csv"):
-    tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
-    tokenizer.pre_tokenizer = Whitespace()
-    trainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
-    tokenizer.train([fileUrl], trainer)
+    pieceTokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
+    pieceTokenizer.pre_tokenizer = Whitespace()
+    pieceTrainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
+    pieceTokenizer.train([fileUrl], pieceTrainer)
 
     data = pd.read_csv(fileUrl)
-    tokenized_data = tokenizer.encode_batch(data["sentence"])
 
-    train_text = [i.tokens for i in tokenized_data]
+    train_text = data.apply(lambda x: " ".join(pieceTokenizer.encode(x['sentence']).tokens) if " " in x['sentence'] else x["sentence"], axis=1)
 
     le = LabelEncoder()
     le.fit(data["lan_code"])
     labels = le.transform(data["lan_code"])
 
-    vectorizer = TfidfVectorizer(ngram_range=(1,3), analyzer=returnSelf)
+    vectorizer = TfidfVectorizer(ngram_range=(1,3))
     vectorizer.fit(train_text)
     train_text = vectorizer.transform(train_text)
 
@@ -51,25 +54,24 @@ def createModel(fileUrl="language_corpus.csv"):
     joblib.dump(languageDetectionModel, "MLModel/language_detection_model.joblib")
     joblib.dump(vectorizer, "MLModel/vectorizer.joblib")
     joblib.dump(le, "MLModel/label_encoder.joblib")
+    joblib.dump(pieceTokenizer, "MLModel/word_piece.joblib")
 
 def testModel(fileUrl="language_corpus.csv"):
-    tokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
-    tokenizer.pre_tokenizer = Whitespace()
-    trainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
-    tokenizer.train([fileUrl], trainer)
+    pieceTokenizer = Tokenizer(WordPiece(unk_token="[UNK]"))
+    pieceTokenizer.pre_tokenizer = Whitespace()
+    pieceTrainer = WordPieceTrainer(vocab_size=50000, special_tokens=["[UNK]"])
+    pieceTokenizer.train([fileUrl], pieceTrainer)
 
     data = pd.read_csv(fileUrl)
-    tokenized_data = tokenizer.encode_batch(data["sentence"])
-
-    tokenized_data = [i.tokens for i in tokenized_data]
+    data["sentence"] = data.apply(lambda x: " ".join(pieceTokenizer.encode(x['sentence']).tokens) if " " in x['sentence'] else x["sentence"], axis=1)
 
     le = LabelEncoder()
     le.fit(data["lan_code"])
     labels = le.transform(data["lan_code"])
 
-    train_text, test_text, train_labels, test_labels = train_test_split(tokenized_data, labels, test_size=0.2)
+    train_text, test_text, train_labels, test_labels = train_test_split(data["sentence"], labels, test_size=0.2)
 
-    vectorizer = TfidfVectorizer(ngram_range=(1,3), analyzer=returnSelf)
+    vectorizer = TfidfVectorizer(ngram_range=(1,3))
     vectorizer.fit(train_text)
     train_text = vectorizer.transform(train_text)
     test_text = vectorizer.transform(test_text)

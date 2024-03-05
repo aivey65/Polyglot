@@ -17,7 +17,6 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -27,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["Polyglot.us-east-2.elasticbeanstalk.com", "127.0.0.1"]
+ALLOWED_HOSTS = ["Polyglot.us-east-2.elasticbeanstalk.com", "127.0.0.1", "3.20.2.172"]
 
 
 # Application definition
@@ -41,11 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'PolyglotApp',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'Polyglot.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,16 +120,22 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = '/static/'
 
-STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/PolyglotApp/')
+]
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'PolyglotApp/static'),
-)
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Whitelist URLs for requests
+CORS_ORIGIN_WHITELIST = [
+    'http://polyglot.us-east-2.elasticbeanstalk.com/',
+    'https://polyglot.us-east-2.elasticbeanstalk.com/',
+]
