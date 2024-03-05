@@ -44,7 +44,7 @@ def createModel(fileUrl="language_corpus.csv"):
     le.fit(data["lan_code"])
     labels = le.transform(data["lan_code"])
 
-    vectorizer = TfidfVectorizer(ngram_range=(1,3))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     vectorizer.fit(train_text)
     train_text = vectorizer.transform(train_text)
 
@@ -71,7 +71,7 @@ def testModel(fileUrl="language_corpus.csv"):
 
     train_text, test_text, train_labels, test_labels = train_test_split(data["sentence"], labels, test_size=0.2)
 
-    vectorizer = TfidfVectorizer(ngram_range=(1,3))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     vectorizer.fit(train_text)
     train_text = vectorizer.transform(train_text)
     test_text = vectorizer.transform(test_text)
