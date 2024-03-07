@@ -90,6 +90,10 @@ To create an admin account:
 
 > python manage.py createsuperuser
 
+To create the staticfiles directory for production:
+
+> python manage.py collectstatic
+
 #### Notes on Deploying
 Instructions:
 Coming Soon...
