@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["Polyglot.us-east-2.elasticbeanstalk.com", "127.0.0.1", "3.20.2.172"]
+ALLOWED_HOSTS = ["Polyglot.us-east-2.elasticbeanstalk.com", "polyglot.ashaiv.com", "127.0.0.1", "3.20.2.172"]
 
 
 # Application definition
@@ -138,4 +138,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_WHITELIST = [
     'http://polyglot.us-east-2.elasticbeanstalk.com/',
     'https://polyglot.us-east-2.elasticbeanstalk.com/',
+    'http://www.polyglot.ashaiv.com',
+    'http://polyglot.ashaiv.com',
+    'https://www.polyglot.ashaiv.com',
+    'https://polyglot.ashaiv.com',
 ]

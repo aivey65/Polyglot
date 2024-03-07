@@ -1,5 +1,5 @@
 :root {
-    --light: #ECF2CF;
+    --light: #F3F7DE;
     --green: #1B998B;
     --red: #E71D36;
     --navy: #272343;
@@ -28,12 +28,16 @@ form {
     gap: var(--smallPad);
 }
 
+#text-input {
+    width: 100%;
+}
+
 label {
     font-size: 1.2rem;
     font-weight: 500;
 }
 
-button {
+button, .button {
     background-color: var(--green);
     border: none;
     color: var(--light);
@@ -43,6 +47,12 @@ button {
     display: inline-block;
     font-size: 1rem;
     border-radius: var(--borderRadius);
+}
+
+.button {
+    width: 100%;
+    align-self: center;
+    margin-bottom: 40px;
 }
 
 #content {
@@ -66,6 +76,7 @@ button {
 #result-content {
     display: grid;
     grid-template-columns: 1fr auto;
+    margin: 40px 0px;
 }
 
 .results-header {
@@ -89,4 +100,15 @@ button {
     font-weight: 600;
     align-self: flex-end;
     color: var(--grey);
+    margin-top: var(--smallPad);
+}
+
+@media only screen and (max-width: 600px) {
+    #form {
+        margin: 40px 10px;
+    }
+
+    h3 {
+        text-align: center;
+    }
 }
