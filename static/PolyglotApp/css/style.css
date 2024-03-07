@@ -50,7 +50,7 @@ button, .button {
 }
 
 .button {
-    width: 100%;
+    width: fit-content;
     align-self: center;
     margin-bottom: 40px;
 }
